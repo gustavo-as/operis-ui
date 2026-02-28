@@ -8,6 +8,12 @@ export interface SwitchCompanyRequest {
   refreshToken: string;
 }
 
+export interface UserCompanyResponse {
+  companyPublicId: string;
+  companyName: string;
+  role: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;

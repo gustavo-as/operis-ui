@@ -1,8 +1,13 @@
 import api from "./client";
-import { AuthResponse, LoginRequest, SwitchCompanyRequest } from "@/types/auth";
+import { AuthResponse, LoginRequest, SwitchCompanyRequest, UserCompanyResponse } from "@/types/auth";
 
 export const login = async (data: LoginRequest): Promise<AuthResponse> => {
   const response = await api.post<AuthResponse>("/api/v1/auth/login", data);
+  return response.data;
+};
+
+export const getUserCompanies = async (): Promise<UserCompanyResponse[]> => {
+  const response = await api.get<UserCompanyResponse[]>("/api/v1/auth/companies");
   return response.data;
 };
 
