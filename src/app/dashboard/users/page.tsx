@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getUsers, updateUserStatus, createUser } from "@/lib/api/users";
 import { UserResponse } from "@/types/auth";
+import UserDrawer from "@/components/UserDrawer";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -11,6 +12,7 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [creating, setCreating] = useState(false);
@@ -26,7 +28,8 @@ export default function UsersPage() {
     });
   }, []);
 
-  const handleToggleStatus = async (publicId: string, active: boolean) => {
+  const handleToggleStatus = async (e: React.MouseEvent, publicId: string, active: boolean) => {
+    e.stopPropagation();
     const updated = await updateUserStatus(publicId, { active: !active });
     setUsers((prev) => prev.map((u) => (u.publicId === publicId ? updated : u)));
   };
@@ -79,7 +82,11 @@ export default function UsersPage() {
               </thead>
               <tbody>
                 {paginated.map((user) => (
-                  <tr key={user.publicId} className="border-b border-gray-50 hover:bg-gray-50 transition">
+                  <tr
+                    key={user.publicId}
+                    onClick={() => setSelectedUser(user)}
+                    className="border-b border-gray-50 hover:bg-gray-50 transition cursor-pointer"
+                  >
                     <td className="px-6 py-4 text-gray-900">{user.email}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -95,7 +102,7 @@ export default function UsersPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => handleToggleStatus(user.publicId, user.active)}
+                        onClick={(e) => handleToggleStatus(e, user.publicId, user.active)}
                         className={`text-xs font-medium px-3 py-1 rounded-lg transition ${
                           user.active
                             ? "bg-red-50 text-red-600 hover:bg-red-100"
@@ -137,6 +144,17 @@ export default function UsersPage() {
         </>
       )}
 
+      {/* Drawer */}
+      <UserDrawer
+        user={selectedUser}
+        onClose={() => setSelectedUser(null)}
+        onUpdated={(updated) => {
+          setUsers((prev) => prev.map((u) => (u.publicId === updated.publicId ? updated : u)));
+          setSelectedUser(null);
+        }}
+      />
+
+      {/* Modal criar utilizador */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
