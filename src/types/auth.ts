@@ -34,3 +34,25 @@ export interface AuthState {
   permissions: string[];
   isAuthenticated: boolean;
 }
+
+export interface UserResponse {
+  publicId: string;
+  email: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateUserRequest {
+  email: string;
+  password: string;
+}
+
+export interface UpdateUserStatusRequest {
+  active: boolean;
+}
+
+export interface UserCompanyAssignRequest {
+  companyPublicId: string;
+  rolePublicId: string;
+}
