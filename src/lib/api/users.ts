@@ -28,3 +28,26 @@ export const getUserCompanies = async (publicId: string): Promise<UserCompanyRes
   const response = await api.get(`/api/v1/users/${publicId}/companies`);
   return response.data as UserCompanyResponse[];
 };
+
+export const updateUser = async (
+  publicId: string,
+  data: CreateUserRequest
+): Promise<UserResponse> => {
+  const response = await api.put(`/api/v1/users/${publicId}`, data);
+  return response.data as UserResponse;
+};
+
+export const assignCompany = async (
+  userPublicId: string,
+  data: { companyPublicId: string; rolePublicId: string }
+): Promise<UserCompanyResponse> => {
+  const response = await api.post(`/api/v1/users/${userPublicId}/companies`, data);
+  return response.data as UserCompanyResponse;
+};
+
+export const removeCompany = async (
+  userPublicId: string,
+  companyPublicId: string
+): Promise<void> => {
+  await api.delete(`/api/v1/users/${userPublicId}/companies/${companyPublicId}`);
+};
