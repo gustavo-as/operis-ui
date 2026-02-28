@@ -144,17 +144,17 @@ export default function UsersPage() {
         </>
       )}
 
-      {/* Drawer */}
-      <UserDrawer
-        user={selectedUser}
-        onClose={() => setSelectedUser(null)}
-        onUpdated={(updated) => {
-          setUsers((prev) => prev.map((u) => (u.publicId === updated.publicId ? updated : u)));
-          setSelectedUser(null);
-        }}
-      />
+      {selectedUser && (
+        <UserDrawer
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+          onUpdated={(updated) => {
+            setUsers((prev) => prev.map((u) => (u.publicId === updated.publicId ? updated : u)));
+            setSelectedUser(null);
+          }}
+        />
+      )}
 
-      {/* Modal criar utilizador */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
