@@ -7,6 +7,8 @@ import CompanySwitcher from "@/components/CompanySwitcher";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/lib/api/auth";
+import { usePermission } from "@/lib/auth/usePermission";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +16,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { isAuthenticated, email, refreshToken, clearAuth } = useAuthStore();
+  const { has } = usePermission();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -26,10 +29,27 @@ export default function DashboardLayout({
   if (!isAuthenticated) return null;
 
   const navItems = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Users", href: "/dashboard/users" },
-    { label: "Companies", href: "/dashboard/companies" },
-  ];
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      visible: true,
+    },
+    {
+      label: "Users",
+      href: "/dashboard/users",
+      visible: has(PERMISSIONS.VIEW_USERS),
+    },
+    {
+      label: "Companies",
+      href: "/dashboard/companies",
+      visible: has(PERMISSIONS.VIEW_COMPANIES),
+    },
+    {
+      label: "Roles",
+      href: "/dashboard/roles",
+      visible: has(PERMISSIONS.MANAGE_ROLES),
+    },
+  ].filter((item) => item.visible);
 
   const handleLogout = async () => {
     try {
