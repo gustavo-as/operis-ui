@@ -6,13 +6,14 @@ import { useEffect } from "react";
 import CompanySwitcher from "@/components/CompanySwitcher";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/lib/api/auth";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, email } = useAuthStore();
+  const { isAuthenticated, email, refreshToken, clearAuth } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -27,7 +28,19 @@ export default function DashboardLayout({
   const navItems = [
     { label: "Dashboard", href: "/dashboard" },
     { label: "Users", href: "/dashboard/users" },
+    { label: "Companies", href: "/dashboard/companies" },
   ];
+
+  const handleLogout = async () => {
+    try {
+      if (refreshToken) {
+        await logout(refreshToken);
+      }
+    } finally {
+      clearAuth();
+      router.push("/login");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -36,6 +49,12 @@ export default function DashboardLayout({
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-500">{email}</span>
           <CompanySwitcher />
+          <button
+            onClick={handleLogout}
+            className="text-sm text-gray-500 hover:text-gray-900 transition"
+          >
+            Logout
+          </button>
         </div>
       </nav>
 
