@@ -29,6 +29,7 @@ export default function DashboardLayout({
     { label: "Dashboard", href: "/dashboard" },
     { label: "Users", href: "/dashboard/users" },
     { label: "Companies", href: "/dashboard/companies" },
+    { label: "Roles", href: "/dashboard/roles" },
   ];
 
   const handleLogout = async () => {
