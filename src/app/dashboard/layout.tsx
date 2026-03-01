@@ -25,9 +25,10 @@ export default function DashboardLayout({
   if (!isAuthenticated) return null;
 
   const navItems = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Users", href: "/dashboard/users" },
-  ];
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Users", href: "/dashboard/users" },
+  { label: "Companies", href: "/dashboard/companies" },
+];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
