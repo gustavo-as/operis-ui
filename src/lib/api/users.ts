@@ -51,3 +51,15 @@ export const removeCompany = async (
 ): Promise<void> => {
   await api.delete(`/api/v1/users/${userPublicId}/companies/${companyPublicId}`);
 };
+
+export const updateHourlyRate = async (
+  userPublicId: string,
+  companyPublicId: string,
+  hourlyRate: number
+): Promise<UserCompanyResponse> => {
+  const response = await api.patch(`/api/v1/users/${userPublicId}/hourly-rate`, {
+    companyPublicId,
+    hourlyRate,
+  });
+  return response.data as UserCompanyResponse;
+};

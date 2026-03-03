@@ -12,6 +12,7 @@ export interface UserCompanyResponse {
   companyPublicId: string;
   companyName: string;
   role: string;
+  hourlyRate: number | null;
 }
 
 export interface AuthResponse {

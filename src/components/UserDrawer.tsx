@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { UserResponse, UserCompanyResponse } from "@/types/auth";
-import { getUserCompanies, updateUser, removeCompany, assignCompany } from "@/lib/api/users";
+import { getUserCompanies, updateUser, removeCompany, assignCompany, updateHourlyRate } from "@/lib/api/users";
 import { getCompanies, getRoles, CompanyOption, RoleOption } from "@/lib/api/companies";
 import { X } from "lucide-react";
 
@@ -30,6 +30,9 @@ export default function UserDrawer({ user, onClose, onUpdated }: Props) {
   const [selectedRole, setSelectedRole] = useState("");
   const [assigning, setAssigning] = useState(false);
   const [assignError, setAssignError] = useState("");
+
+  const [editingRate, setEditingRate] = useState<string | null>(null);
+  const [rateValue, setRateValue] = useState<string>("");
 
   useEffect(() => {
     if (user) {
@@ -95,6 +98,15 @@ export default function UserDrawer({ user, onClose, onUpdated }: Props) {
     if (!user) return;
     await removeCompany(user.publicId, companyPublicId);
     setCompanies((prev) => prev.filter((c) => c.companyPublicId !== companyPublicId));
+  };
+
+  const handleUpdateRate = async (companyPublicId: string) => {
+  if (!user) return;
+  const updated = await updateHourlyRate(user.publicId, companyPublicId, parseFloat(rateValue));
+  setCompanies((prev) =>
+    prev.map((c) => (c.companyPublicId === companyPublicId ? { ...c, hourlyRate: updated.hourlyRate } : c))
+  );
+    setEditingRate(null);
   };
 
   if (!user) return null;
@@ -219,18 +231,66 @@ export default function UserDrawer({ user, onClose, onUpdated }: Props) {
                     {companies.map((c) => (
                       <div
                         key={c.companyPublicId}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-xl"
+                        className="p-4 border border-gray-200 rounded-xl space-y-3"
                       >
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{c.companyName}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{c.role}</p>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{c.companyName}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">{c.role}</p>
+                          </div>
+                          <button
+                            onClick={() => handleRemoveCompany(c.companyPublicId)}
+                            className="text-xs text-red-500 hover:text-red-700 transition"
+                          >
+                            Remove
+                          </button>
                         </div>
-                        <button
-                          onClick={() => handleRemoveCompany(c.companyPublicId)}
-                          className="text-xs text-red-500 hover:text-red-700 transition"
-                        >
-                          Remove
-                        </button>
+
+                        {/* Hourly Rate */}
+                        <div className="flex items-center gap-2">
+                          {editingRate === c.companyPublicId ? (
+                            <>
+                              <input
+                                type="number"
+                                value={rateValue}
+                                onChange={(e) => setRateValue(e.target.value)}
+                                className="w-24 px-2 py-1 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-gray-900"
+                                placeholder="0.00"
+                                step="0.01"
+                              />
+                              <button
+                                onClick={() => handleUpdateRate(c.companyPublicId)}
+                                className="text-xs text-green-600 hover:text-green-800 font-medium transition"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => setEditingRate(null)}
+                                className="text-xs text-gray-400 hover:text-gray-600 transition"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500">
+                                Hourly rate:{" "}
+                                <span className="font-medium text-gray-900">
+                                  {c.hourlyRate ? `€${c.hourlyRate}/h` : "—"}
+                                </span>
+                              </span>
+                              <button
+                                onClick={() => {
+                                  setEditingRate(c.companyPublicId);
+                                  setRateValue(c.hourlyRate?.toString() || "");
+                                }}
+                                className="text-xs text-gray-400 hover:text-gray-700 transition"
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
